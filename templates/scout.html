@@ -51,11 +51,27 @@
         }
     }
 
+    function increment(fieldId) {
+        let countField = document.getElementById(fieldId);
+        countField.value = parseInt(countField.value) + 1;
+    }
+
+    function reset(panelPrefix) {
+        const fields = document.querySelectorAll(`input[id^='${panelPrefix}']`);
+        fields.forEach(f => f.value = 0);
+    }
+
+    function manualUpdate(fieldId) {
+        // Called automatically when scout types a number
+        // Already live updated via input fields
+    }
+
     window.onload = function() {
         loadMatches();
     }
     </script>
 </head>
+
 <body>
     <h1>📍 Scouting Event: <span id="event_name">{{ event_name }}</span></h1>
     <button onclick="switchEvent()">Switch Event</button>
@@ -69,34 +85,42 @@
         <label>Team:</label>
         <select id="team_number" name="team_number"></select><br>
 
-        <h3>Auto</h3>
-        <label>Auto Line:</label>
-        <select name="auto_line">
-            <option>Yes</option>
-            <option>No</option>
+        <h2>Auto Phase Scoring</h2>
+        <div id="auto-panel">
+            {% for label in ['Coral L4', 'Coral L3', 'Coral L2', 'Coral L1', 'Coral Trough', 'Algae Processor', 'Algae Net'] %}
+                <button type="button" onclick="increment('auto_{{ label.replace(' ', '_') }}')">{{ label }}</button>
+                Count: <input type="number" name="auto_{{ label.replace(' ', '_') }}" id="auto_{{ label.replace(' ', '_') }}" value="0" onchange="manualUpdate('auto_{{ label.replace(' ', '_') }}')" style="width: 50px;"><br>
+            {% endfor %}
+            <button type="button" onclick="reset('auto_')">Reset Auto Panel</button>
+        </div>
+
+        <h2>Tele-op Phase Scoring</h2>
+        <div id="teleop-panel">
+            {% for label in ['Coral L4', 'Coral L3', 'Coral L2', 'Coral L1', 'Coral Trough', 'Algae Processor', 'Algae Net'] %}
+                <button type="button" onclick="increment('teleop_{{ label.replace(' ', '_') }}')">{{ label }}</button>
+                Count: <input type="number" name="teleop_{{ label.replace(' ', '_') }}" id="teleop_{{ label.replace(' ', '_') }}" value="0" onchange="manualUpdate('teleop_{{ label.replace(' ', '_') }}')" style="width: 50px;"><br>
+            {% endfor %}
+            <button type="button" onclick="reset('teleop_')">Reset Tele-op Panel</button>
+        </div>
+
+        <h2>Pickup Style</h2>
+        <label>Coral Pickup:</label>
+        <select name="coral_pickup">
+            <option>Floor</option>
+            <option>Human Player</option>
+            <option>Both</option>
+            <option>None</option>
         </select><br>
 
-        <label>Dead Auto:</label>
-        <select name="dead_auto">
-            <option>Yes</option>
-            <option>No</option>
+        <label>Algae Pickup:</label>
+        <select name="algae_pickup">
+            <option>Floor</option>
+            <option>Reef</option>
+            <option>Both</option>
+            <option>None</option>
         </select><br>
 
-        <label>Start Position:</label>
-        <select name="start_position">
-            <option>Left</option>
-            <option>Middle</option>
-            <option>Right</option>
-        </select><br>
-
-        <h3>Tele-op</h3>
-        <label>Coral Scoring:</label>
-        <input type="number" name="coral_score" min="0" max="10"><br>
-
-        <label>Coral Drops:</label>
-        <input type="number" name="coral_drops" min="0" max="10"><br>
-
-        <h3>Endgame</h3>
+        <h2>Endgame</h2>
         <label>Endgame Result:</label>
         <select name="endgame_result">
             <option>Shallow</option>
@@ -106,18 +130,43 @@
             <option>No Attempt</option>
         </select><br>
 
-        <h3>Fouls</h3>
-        <label>Minor Fouls:</label>
-        <input type="number" name="minor_fouls" min="0" max="10"><br>
+        <h2>Comments</h2>
+        {% set comments = [
+            "Dead Entire Match", "Excellent Drivers", "Good Drivers", "Drivers Had Difficulty Maneuvering The Field",
+            "Drivers coordinate well with Robots on Alliance", "Wobbles when Driving", "Has Trouble Turning", "Tipped Over",
+            "Scores Mostly Algae", "Scores Mostly Coral", "Scores Coral with less than 25% Accuracy", "Scores Coral with 50% Accuracy",
+            "Scores Coral with 75% Accuracy", "Scores Coral with 90% Accuracy", "Game Piece manipulation is Very Effective",
+            "Has Vision Tracking for Piece Delivery", "Effective Autonomous", "Non-Effective Autonomous",
+            "I Would Want This Team On Our Alliance", "Collects pieces from Human Player Station well",
+            "Struggles at collecting pieces from the Human Player Station", "Good At Avoiding Defensive Robots",
+            "Drives Quickly", "Drives Slowly", "Swerve Drive", "Tank Drive", "Mechanum Drive",
+            "Effective at picking up Algae", "Struggles with picking up Algae",
+            "Effective at picking up Coral", "Struggles with picking up Coral",
+            "Could not pick up game pieces", "Can Climb Quickly", "Climbs Slowly",
+            "Had Difficulty Climbing", "Robot Fell While Climbing", "Strong Ability to Defend (stopped teams for 60+ seconds)",
+            "Weak Ability to Defend (10-29 seconds)", "Decent Ability to Defend (30-59 seconds)", "Did not Defend",
+            "Played Mostly Defense", "Drivers Had Difficulty Lining Up",
+            "Robot Picks Up Coral From Floor", "Robot Picks Up Coral From Coral Station", "Robot Picks Up Coral From Both Floor And Station"
+        ] %}
 
-        <label>Major Fouls:</label>
-        <input type="number" name="major_fouls" min="0" max="10"><br>
+        <label>Comment 1:</label>
+        <select name="comment_1">
+            {% for comment in comments %}
+                <option value="{{ comment }}">{{ comment }}</option>
+            {% endfor %}
+        </select><br>
 
-        <h3>Comments</h3>
-        <label>Predefined Comment:</label>
-        <select name="predefined_comment">
-            {% for i in range(1, 46) %}
-                <option value="{{ i }}">Comment {{ i }}</option>
+        <label>Comment 2:</label>
+        <select name="comment_2">
+            {% for comment in comments %}
+                <option value="{{ comment }}">{{ comment }}</option>
+            {% endfor %}
+        </select><br>
+
+        <label>Comment 3:</label>
+        <select name="comment_3">
+            {% for comment in comments %}
+                <option value="{{ comment }}">{{ comment }}</option>
             {% endfor %}
         </select><br>
 
@@ -128,4 +177,3 @@
     </form>
 </body>
 </html>
-
