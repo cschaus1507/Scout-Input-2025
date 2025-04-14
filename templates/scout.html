@@ -70,6 +70,33 @@
     window.onload = function() {
         loadMatches();
     }
+    function dropdownMatchSelected() {
+    let selectedMatch = document.getElementById('match_number_dropdown').value;
+    document.getElementById('match_number_final').value = selectedMatch;
+    loadTeamsForSelectedMatch(selectedMatch);
+    }
+    
+    function manualMatchTyped() {
+        let manualMatch = document.getElementById('match_number_manual').value;
+        document.getElementById('match_number_final').value = manualMatch;
+        loadTeamsForSelectedMatch(manualMatch);
+    }
+    
+    function loadTeamsForSelectedMatch(matchNumber) {
+        fetch(`/get_teams/${currentEvent}/${matchNumber}`)
+        .then(response => response.json())
+        .then(data => {
+            let teamSelect = document.getElementById('team_number');
+            teamSelect.innerHTML = '';
+            data.forEach(team => {
+                let option = document.createElement('option');
+                option.value = team;
+                option.textContent = team;
+                teamSelect.appendChild(option);
+            });
+        });
+    }
+
     </script>
 </head>
 
