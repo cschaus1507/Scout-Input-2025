@@ -87,7 +87,7 @@
 
         <h2>Auto Phase Scoring</h2>
         <div id="auto-panel">
-            {% for label in ['Coral L4', 'Coral L3', 'Coral L2', 'Coral L1', 'Coral Trough', 'Algae Processor', 'Algae Net'] %}
+            {% for label in ['Coral L4', 'Coral L3', 'Coral L2', 'Coral L1', 'Algae Processor', 'Algae Net'] %}
                 <button type="button" onclick="increment('auto_{{ label.replace(' ', '_') }}')">{{ label }}</button>
                 Count: <input type="number" name="auto_{{ label.replace(' ', '_') }}" id="auto_{{ label.replace(' ', '_') }}" value="0" onchange="manualUpdate('auto_{{ label.replace(' ', '_') }}')" style="width: 50px;"><br>
             {% endfor %}
@@ -96,7 +96,7 @@
 
         <h2>Tele-op Phase Scoring</h2>
         <div id="teleop-panel">
-            {% for label in ['Coral L4', 'Coral L3', 'Coral L2', 'Coral L1', 'Coral Trough', 'Algae Processor', 'Algae Net'] %}
+            {% for label in ['Coral L4', 'Coral L3', 'Coral L2', 'Coral L1', 'Algae Processor', 'Algae Net'] %}
                 <button type="button" onclick="increment('teleop_{{ label.replace(' ', '_') }}')">{{ label }}</button>
                 Count: <input type="number" name="teleop_{{ label.replace(' ', '_') }}" id="teleop_{{ label.replace(' ', '_') }}" value="0" onchange="manualUpdate('teleop_{{ label.replace(' ', '_') }}')" style="width: 50px;"><br>
             {% endfor %}
