@@ -3,15 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <title>Scout Match</title>
+    <script>
+    let currentEvent = "{{ event_id }}";
+
+    function loadMatches() {
+        fetch(`/get_matches/${currentEvent}`)
+        .then(response => response.json())
+        .then(data => {
+            let matchSelect = document.getElementById('match_number');
+            matchSelect.innerHTML = '';
+            data.forEach(match => {
+                let option = document.createElement('option');
+                option.value = match;
+                option.textContent = match;
+                matchSelect.appendChild(option);
+            });
+            loadTeams(); // Auto-load teams for first match
+        });
+    }
+
+    function loadTeams() {
+        const matchNumber = document.getElementById('match_number').value;
+        fetch(`/get_teams/${currentEvent}/${matchNumber}`)
+        .then(response => response.json())
+        .then(data => {
+            let teamSelect = document.getElementById('team_number');
+            teamSelect.innerHTML = '';
+            data.forEach(team => {
+                let option = document.createElement('option');
+                option.value = team;
+                option.textContent = team;
+                teamSelect.appendChild(option);
+            });
+        });
+    }
+
+    function switchEvent() {
+        const newEvent = prompt("Enter new event ID (like 2024nyro):");
+        if (newEvent) {
+            currentEvent = newEvent;
+            fetch(`/get_event_name/${currentEvent}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('event_name').textContent = data.event_name;
+                loadMatches();
+            });
+        }
+    }
+
+    window.onload = function() {
+        loadMatches();
+    }
+    </script>
 </head>
 <body>
-    <h1>📍 Scouting Event: {{ event_name }}</h1>
-    <h2>Match #: {{ current_match.match_number }}</h2>
-    <h2>Assigned Team: {{ assigned_team }}</h2>
+    <h1>📍 Scouting Event: <span id="event_name">{{ event_name }}</span></h1>
+    <button onclick="switchEvent()">Switch Event</button>
 
-    <form method="POST">
-        <input type="hidden" name="assigned_team" value="{{ assigned_team }}">
-        <input type="hidden" name="match_number" value="{{ current_match.match_number }}">
+    <form method="POST" action="/submit">
+        <input type="hidden" name="event_id" value="{{ event_id }}">
+
+        <label>Match:</label>
+        <select id="match_number" name="match_number" onchange="loadTeams()"></select><br>
+
+        <label>Team:</label>
+        <select id="team_number" name="team_number"></select><br>
 
         <h3>Auto</h3>
         <label>Auto Line:</label>
@@ -72,3 +128,4 @@
     </form>
 </body>
 </html>
+
