@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Scout Match</title>
+</head>
+<body>
+    <h1>📍 Scouting Event: {{ event_name }}</h1>
+    <h2>Match #: {{ current_match.match_number }}</h2>
+    <h2>Assigned Team: {{ assigned_team }}</h2>
+
+    <form method="POST">
+        <input type="hidden" name="assigned_team" value="{{ assigned_team }}">
+        <input type="hidden" name="match_number" value="{{ current_match.match_number }}">
+
+        <h3>Auto</h3>
+        <label>Auto Line:</label>
+        <select name="auto_line">
+            <option>Yes</option>
+            <option>No</option>
+        </select><br>
+
+        <label>Dead Auto:</label>
+        <select name="dead_auto">
+            <option>Yes</option>
+            <option>No</option>
+        </select><br>
+
+        <label>Start Position:</label>
+        <select name="start_position">
+            <option>Left</option>
+            <option>Middle</option>
+            <option>Right</option>
+        </select><br>
+
+        <h3>Tele-op</h3>
+        <label>Coral Scoring:</label>
+        <input type="number" name="coral_score" min="0" max="10"><br>
+
+        <label>Coral Drops:</label>
+        <input type="number" name="coral_drops" min="0" max="10"><br>
+
+        <h3>Endgame</h3>
+        <label>Endgame Result:</label>
+        <select name="endgame_result">
+            <option>Shallow</option>
+            <option>Deep</option>
+            <option>Park</option>
+            <option>Attempt</option>
+            <option>No Attempt</option>
+        </select><br>
+
+        <h3>Fouls</h3>
+        <label>Minor Fouls:</label>
+        <input type="number" name="minor_fouls" min="0" max="10"><br>
+
+        <label>Major Fouls:</label>
+        <input type="number" name="major_fouls" min="0" max="10"><br>
+
+        <h3>Comments</h3>
+        <label>Predefined Comment:</label>
+        <select name="predefined_comment">
+            {% for i in range(1, 46) %}
+                <option value="{{ i }}">Comment {{ i }}</option>
+            {% endfor %}
+        </select><br>
+
+        <label>Custom Comment:</label>
+        <input type="text" name="custom_comment"><br><br>
+
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>
