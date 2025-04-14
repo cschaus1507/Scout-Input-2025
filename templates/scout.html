@@ -81,7 +81,10 @@
         <input type="hidden" name="event_id" value="{{ event_id }}">
 
         <label>Match:</label>
-        <select id="match_number" name="match_number" onchange="loadTeams()"></select><br>
+        <select id="match_number_dropdown" onchange="dropdownMatchSelected()"></select>
+        OR
+        <input type="number" id="match_number_manual" placeholder="Or type match #" onchange="manualMatchTyped()" style="width: 100px;"><br>
+        <input type="hidden" name="match_number" id="match_number_final">
 
         <label>Team:</label>
         <select id="team_number" name="team_number"></select><br>
