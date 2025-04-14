@@ -11,7 +11,7 @@
         fetch(`/get_matches/${currentEvent}`)
         .then(response => response.json())
         .then(data => {
-            let matchSelect = document.getElementById('match_number');
+            let matchSelect = document.getElementById('match_number_dropdown');
             matchSelect.innerHTML = '';
             data.forEach(match => {
                 let option = document.createElement('option');
@@ -19,12 +19,22 @@
                 option.textContent = match;
                 matchSelect.appendChild(option);
             });
-            loadTeams(); // Auto-load teams for first match
         });
     }
 
-    function loadTeams() {
-        const matchNumber = document.getElementById('match_number').value;
+    function dropdownMatchSelected() {
+        let selectedMatch = document.getElementById('match_number_dropdown').value;
+        document.getElementById('match_number_final').value = selectedMatch;
+        loadTeamsForSelectedMatch(selectedMatch);
+    }
+
+    function manualMatchTyped() {
+        let manualMatch = document.getElementById('match_number_manual').value;
+        document.getElementById('match_number_final').value = manualMatch;
+        loadTeamsForSelectedMatch(manualMatch);
+    }
+
+    function loadTeamsForSelectedMatch(matchNumber) {
         fetch(`/get_teams/${currentEvent}/${matchNumber}`)
         .then(response => response.json())
         .then(data => {
@@ -62,76 +72,41 @@
         fields.forEach(f => f.value = 0);
     }
 
-    function manualUpdate(fieldId) {
-        // Called automatically when scout types a number
-        // Already live updated via input fields
-    }
-
     window.onload = function() {
         loadMatches();
     }
-    function dropdownMatchSelected() {
-    let selectedMatch = document.getElementById('match_number_dropdown').value;
-    document.getElementById('match_number_final').value = selectedMatch;
-    loadTeamsForSelectedMatch(selectedMatch);
-    }
-    
-    function manualMatchTyped() {
-        let manualMatch = document.getElementById('match_number_manual').value;
-        document.getElementById('match_number_final').value = manualMatch;
-        loadTeamsForSelectedMatch(manualMatch);
-    }
-    
-    function loadTeamsForSelectedMatch(matchNumber) {
-        fetch(`/get_teams/${currentEvent}/${matchNumber}`)
-        .then(response => response.json())
-        .then(data => {
-            let teamSelect = document.getElementById('team_number');
-            teamSelect.innerHTML = '';
-            data.forEach(team => {
-                let option = document.createElement('option');
-                option.value = team;
-                option.textContent = team;
-                teamSelect.appendChild(option);
-            });
-        });
-    }
-
     </script>
 </head>
 
 <body>
-    <h1>📍 Scouting Event: <span id="event_name">{{ event_name }}</span></h1>
-    <button onclick="switchEvent()">Switch Event</button>
-
     <form method="POST" action="/submit">
-        <input type="hidden" name="event_id" value="{{ event_id }}">
+        <h1>📍 Scouting Event: <span id="event_name">{{ event_name }}</span></h1>
+        <button type="button" onclick="switchEvent()">Switch Event</button>
 
-        <label>Match:</label>
+        <label>Match (Select or Type):</label>
         <select id="match_number_dropdown" onchange="dropdownMatchSelected()"></select>
-        OR
-        <input type="number" id="match_number_manual" placeholder="Or type match #" onchange="manualMatchTyped()" style="width: 100px;"><br>
+        <input type="number" id="match_number_manual" placeholder="Or type match #" onchange="manualMatchTyped()" style="width: 100px;">
         <input type="hidden" name="match_number" id="match_number_final">
 
         <label>Team:</label>
-        <select id="team_number" name="team_number"></select><br>
+        <select id="team_number" name="team_number"></select>
 
         <h2>Auto Phase Scoring</h2>
         <div id="auto-panel">
             {% for label in ['Coral L4', 'Coral L3', 'Coral L2', 'Coral L1', 'Algae Processor', 'Algae Net'] %}
                 <button type="button" onclick="increment('auto_{{ label.replace(' ', '_') }}')">{{ label }}</button>
-                Count: <input type="number" name="auto_{{ label.replace(' ', '_') }}" id="auto_{{ label.replace(' ', '_') }}" value="0" onchange="manualUpdate('auto_{{ label.replace(' ', '_') }}')" style="width: 50px;"><br>
+                Count: <input type="number" name="auto_{{ label.replace(' ', '_') }}" id="auto_{{ label.replace(' ', '_') }}" value="0" style="width: 50px;"><br>
             {% endfor %}
-            <button type="button" onclick="reset('auto_')">Reset Auto Panel</button>
+            <button type="button" class="reset" onclick="reset('auto_')">Reset Auto Panel</button>
         </div>
 
         <h2>Tele-op Phase Scoring</h2>
         <div id="teleop-panel">
             {% for label in ['Coral L4', 'Coral L3', 'Coral L2', 'Coral L1', 'Algae Processor', 'Algae Net'] %}
                 <button type="button" onclick="increment('teleop_{{ label.replace(' ', '_') }}')">{{ label }}</button>
-                Count: <input type="number" name="teleop_{{ label.replace(' ', '_') }}" id="teleop_{{ label.replace(' ', '_') }}" value="0" onchange="manualUpdate('teleop_{{ label.replace(' ', '_') }}')" style="width: 50px;"><br>
+                Count: <input type="number" name="teleop_{{ label.replace(' ', '_') }}" id="teleop_{{ label.replace(' ', '_') }}" value="0" style="width: 50px;"><br>
             {% endfor %}
-            <button type="button" onclick="reset('teleop_')">Reset Tele-op Panel</button>
+            <button type="button" class="reset" onclick="reset('teleop_')">Reset Tele-op Panel</button>
         </div>
 
         <h2>Pickup Style</h2>
@@ -141,7 +116,7 @@
             <option>Human Player</option>
             <option>Both</option>
             <option>None</option>
-        </select><br>
+        </select>
 
         <label>Algae Pickup:</label>
         <select name="algae_pickup">
@@ -149,7 +124,7 @@
             <option>Reef</option>
             <option>Both</option>
             <option>None</option>
-        </select><br>
+        </select>
 
         <h2>Endgame</h2>
         <label>Endgame Result:</label>
@@ -159,7 +134,7 @@
             <option>Park</option>
             <option>Attempt</option>
             <option>No Attempt</option>
-        </select><br>
+        </select>
 
         <h2>Comments</h2>
         {% set comments = [
@@ -185,25 +160,26 @@
             {% for comment in comments %}
                 <option value="{{ comment }}">{{ comment }}</option>
             {% endfor %}
-        </select><br>
+        </select>
 
         <label>Comment 2:</label>
         <select name="comment_2">
             {% for comment in comments %}
                 <option value="{{ comment }}">{{ comment }}</option>
             {% endfor %}
-        </select><br>
+        </select>
 
         <label>Comment 3:</label>
         <select name="comment_3">
             {% for comment in comments %}
                 <option value="{{ comment }}">{{ comment }}</option>
             {% endfor %}
-        </select><br>
+        </select>
 
         <label>Custom Comment:</label>
-        <input type="text" name="custom_comment"><br><br>
+        <input type="text" name="custom_comment">
 
+        <br><br>
         <button type="submit">Submit</button>
     </form>
 </body>
